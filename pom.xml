@@ -7,15 +7,16 @@
     <groupId>org.athena</groupId>
     <artifactId>athena-parent</artifactId>
     <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>Athena</name>
+    <description>Athena is a chat server</description>
+
     <modules>
         <module>core</module>
         <module>server</module>
         <module>client</module>
         <module>gateway</module>
     </modules>
-    <packaging>pom</packaging>
-    <name>Athena</name>
-    <description>Athena is a chat server</description>
 
     <properties>
         <source.version>1.8</source.version>

@@ -91,7 +91,7 @@ public class ByteUtil {
      * @return 十进制数字
      */
     public static int binary2Decimal(String binary) {
-        Condition.notBlank(binary, "input must not null");
+        Assert.notBlank(binary, "input must not null");
         String[] arr = binary.split("");
         int result = 0;
         for (int i = arr.length - 1, factor = 0; i >= 0; i--, factor++) {
@@ -138,7 +138,7 @@ public class ByteUtil {
      * @return 二进制
      */
     public static String octal2Binary(String octal) {
-        Condition.notBlank(octal, "input must not null");
+        Assert.notBlank(octal, "input must not null");
         StringBuilder result = new StringBuilder();
         String[] arr = octal.split("");
         for (String o : arr) {
@@ -159,7 +159,7 @@ public class ByteUtil {
      * @return 十六进制
      */
     public static String binary2Hex(String binary) {
-        Condition.notBlank(binary, "input must not null");
+        Assert.notBlank(binary, "input must not null");
         StringBuilder result = new StringBuilder();
         String[] arr = format(binary, 4);
         for (int i = 0; i < arr.length; i += 4) {
@@ -179,7 +179,7 @@ public class ByteUtil {
      * @return 二进制
      */
     public static String hex2Binary(String hex) {
-        Condition.notBlank(hex, "input must not null");
+        Assert.notBlank(hex, "input must not null");
         StringBuilder result = new StringBuilder();
         String[] arr = hex.toUpperCase().split("");
         for (String o : arr) {
@@ -212,7 +212,7 @@ public class ByteUtil {
      * @return 十进制
      */
     public static long octal2Decimal(String octal) {
-        Condition.notBlank(octal, "input must not null");
+        Assert.notBlank(octal, "input must not null");
         String[] arr = octal.split("");
         long result = 0;
         for (int i = arr.length - 1, factor = 0; i >= 0; i--, factor++) {
@@ -240,7 +240,7 @@ public class ByteUtil {
      * @return 十进制
      */
     public static long hex2Decimal(String hex) {
-        Condition.notBlank(hex, "input must not null");
+        Assert.notBlank(hex, "input must not null");
         String[] arr = hex.toUpperCase().split("");
         long result = 0;
         for (int i = arr.length - 1, factor = 0; i >= 0; i--, factor++) {
