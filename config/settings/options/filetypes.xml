@@ -1,9 +1,10 @@
 <application>
   <component name="FileTypeManager" version="17">
+    <ignoreFiles list="*.flattened-pom.xml;*.hprof;*.pyc;*.pyo;*.rbc;*.yarb;*~;.DS_Store;.git;.hg;.svn;CVS;__pycache__;_svn;vssver.scc;vssver2.scc;" />
     <extensionMap>
       <mapping pattern="LICENSE_996" type="PLAIN_TEXT" />
-      <mapping ext="bin" type="PLAIN_TEXT" />
       <mapping ext="cert" type="PLAIN_TEXT" />
+      <mapping ext="bin" type="PLAIN_TEXT" />
       <mapping ext="tmp" type="PLAIN_TEXT" />
       <mapping ext="config" type="PLAIN_TEXT" />
       <removed_mapping ext="bin" approved="true" type="Native" />
