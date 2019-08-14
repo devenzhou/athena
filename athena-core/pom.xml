@@ -5,7 +5,7 @@
   <parent>
     <artifactId>athena-parent</artifactId>
     <groupId>top.feb13th</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <name>Athena Core</name>
-  <description>common utils</description>
+  <description>框架基础对象 - 一些公共类和一些支持类</description>
 
   <dependencies>
 

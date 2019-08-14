@@ -7,7 +7,7 @@
   <parent>
     <artifactId>athena-parent</artifactId>
     <groupId>top.feb13th</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>athena-netty</artifactId>
@@ -15,7 +15,7 @@
   <packaging>jar</packaging>
 
   <name>Athena Netty</name>
-  <description>Internet inactive by netty</description>
+  <description>对netty进行二次封装 - 对底层通信框架进行解耦</description>
 
   <dependencies>
     <!-- self module -->

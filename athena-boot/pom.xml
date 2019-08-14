@@ -7,7 +7,7 @@
   <parent>
     <artifactId>athena-parent</artifactId>
     <groupId>top.feb13th</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>athena-boot</artifactId>
@@ -15,7 +15,7 @@
   <packaging>jar</packaging>
 
   <name>Athena Boot</name>
-  <description>Boot starter</description>
+  <description>框架测试项目 - 用于对整个框架进行测试</description>
 
   <dependencies>
     <dependency>
@@ -27,16 +27,6 @@
       <artifactId>athena-netty</artifactId>
     </dependency>
 
-    <!-- spring boot -->
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.boot</groupId>-->
-<!--      <artifactId>spring-boot-starter-web</artifactId>-->
-<!--    </dependency>-->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <scope>compile</scope>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
@@ -50,18 +40,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

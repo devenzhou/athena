@@ -12,11 +12,11 @@
 
   <groupId>top.feb13th</groupId>
   <artifactId>athena-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
-  <name>Athena</name>
-  <description>Athena is a chat server</description>
+  <name>Athena Parent</name>
+  <description>整个项目的父工程，用于管理项目依赖及插件版本</description>
 
 
   <modules>
@@ -26,8 +26,6 @@
   </modules>
 
   <properties>
-    <self.module.version>1.0.0-SNAPSHOT</self.module.version>
-
     <java.version>1.8</java.version>
     <source.version>1.8</source.version>
     <target.version>1.8</target.version>
@@ -65,12 +63,12 @@
       <dependency>
         <groupId>top.feb13th</groupId>
         <artifactId>athena-core</artifactId>
-        <version>${self.module.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>top.feb13th</groupId>
         <artifactId>athena-netty</artifactId>
-        <version>${self.module.version}</version>
+        <version>${project.version}</version>
       </dependency>
 
       <!-- netty -->
@@ -272,6 +270,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
     </plugins>
     <pluginManagement>
