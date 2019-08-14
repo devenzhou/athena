@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -66,9 +66,11 @@ public class DateUtil {
 
   /**
    * 获取 LocalDateTime 对应的时间戳
+   *
+   * <p> {@link LocalDateTime} 不存在时区, 如果需要获取当前时区的时间戳, 则需要转换为 {@link ZonedDateTime}
    */
   public static long getTimestamp(LocalDateTime localDateTime) {
-    return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+    return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
   }
 
   /**

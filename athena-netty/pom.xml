@@ -18,6 +18,12 @@
   <description>Internet inactive by netty</description>
 
   <dependencies>
+    <!-- self module -->
+    <dependency>
+      <groupId>top.feb13th</groupId>
+      <artifactId>athena-core</artifactId>
+    </dependency>
+
     <!-- netty -->
     <dependency>
       <groupId>io.netty</groupId>
