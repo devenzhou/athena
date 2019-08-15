@@ -2,8 +2,6 @@ package top.feb13th.athena.support;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 模块bean容器
@@ -13,8 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ModuleBeanHolder {
 
-  private static final Logger logger = LoggerFactory.getLogger(ModuleBeanWrapper.class);
-
+  // row:module  cel:command  value:ModuleBeanWrapper
   private static final Table<Integer, Integer, ModuleBeanWrapper> TABLE = HashBasedTable.create();
 
   /**
@@ -31,6 +28,12 @@ public class ModuleBeanHolder {
     TABLE.put(module, command, wrapper);
   }
 
+  /**
+   * 根据模块号和命令号获取执行方法
+   *
+   * @param module 模块号
+   * @param command 命令号
+   */
   public static ModuleBeanWrapper get(int module, int command) {
     return TABLE.get(module, command);
   }

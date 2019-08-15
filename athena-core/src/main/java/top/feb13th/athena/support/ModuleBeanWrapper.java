@@ -21,10 +21,18 @@ public class ModuleBeanWrapper {
   private int module;
   // 命令号
   private int command;
+  // 是否是入口函数
+  private boolean enter;
   // (模块号 + 命令号) -> 方法
   private Method method;
   // 方法名
   private String methodName;
+  // 方法参数
+  private Class<?>[] parameterTypes;
+  // 对象
+  private Object bean;
+  // 对象名称
+  private String beanName;
 
   @Override
   public boolean equals(Object object) {
