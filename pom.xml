@@ -21,8 +21,8 @@
 
   <modules>
     <module>athena-core</module>
-    <module>athena-netty</module>
-    <module>athena-boot</module>
+    <module>athena-server</module>
+    <module>athena-client</module>
   </modules>
 
   <properties>
@@ -37,6 +37,7 @@
     <junit.version>4.12</junit.version>
     <slf4j.api.version>1.7.26</slf4j.api.version>
     <logback.version>1.2.3</logback.version>
+    <guava.version>22.0</guava.version>
     <commons.lang3.version>3.9</commons.lang3.version>
     <commons.codec.version>1.12</commons.codec.version>
     <commons.io.version>2.6</commons.io.version>
@@ -179,6 +180,13 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${logback.version}</version>
+      </dependency>
+
+      <!-- guava -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
       </dependency>
 
       <!-- commons -->

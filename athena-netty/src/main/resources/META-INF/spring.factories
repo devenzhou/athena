@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  top.feb13th.athena.netty.NettyAutoConfiguration

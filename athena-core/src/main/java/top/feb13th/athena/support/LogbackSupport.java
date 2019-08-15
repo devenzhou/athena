@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  * @author zhoutaotao
  * @date 2019/6/28
  */
-public class LoggingSupport {
+public class LogbackSupport {
 
   /**
    * 从给定的绝对地址加载logback配置文件

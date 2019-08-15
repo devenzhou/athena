@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
  * @author zhoutaotao
  * @date 2019/6/28
  */
-public class LoggingSupportTest {
+public class LogbackSupportTest {
 
     @Test
     public void testLoadLogbackXMLInClasspath() {
-        LoggingSupport.loadLogbackXMLInClasspath("logback.xml");
+        LogbackSupport.loadLogbackXMLInClasspath("logback.xml");
         Logger logger = LoggerFactory.getLogger("testLogback");
         logger.info("输出测试日志");
     }
