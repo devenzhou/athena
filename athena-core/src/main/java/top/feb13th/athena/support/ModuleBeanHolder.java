@@ -2,6 +2,8 @@ package top.feb13th.athena.support;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 模块bean容器
@@ -10,6 +12,9 @@ import com.google.common.collect.Table;
  * @date 2019/8/15 16:31
  */
 public class ModuleBeanHolder {
+
+  // 日志
+  private static final Logger logger = LoggerFactory.getLogger(ModuleBeanHolder.class);
 
   // row:module  cel:command  value:ModuleBeanWrapper
   private static final Table<Integer, Integer, ModuleBeanWrapper> TABLE = HashBasedTable.create();
@@ -25,6 +30,15 @@ public class ModuleBeanHolder {
           "The same Module and Command to different method, module:" + module + ", command:"
               + command + ", methodName:" + wrapper.getMethodName());
     }
+
+    if (logger.isDebugEnabled()) {
+      String beanName = wrapper.getBeanName();
+      String methodName = wrapper.getMethodName();
+      logger.debug(
+          "Register Module Command Bean, module:{}, command:{}, beanName:{}, methodName:{}",
+          module, command, beanName, methodName);
+    }
+
     TABLE.put(module, command, wrapper);
   }
 

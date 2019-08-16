@@ -1,9 +1,17 @@
 package top.feb13th.athena.protocol;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import top.feb13th.athena.support.ConnectionChecker;
 
 /**
  * 请求解码器
@@ -65,6 +73,13 @@ public class RequestDecoder extends ByteToMessageDecoder {
       Request request = new Request(module, command, body);
       out.add(request);
     }
-
   }
+
+
+  @Override
+  public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    ConnectionChecker.offer(ctx);
+    super.channelActive(ctx);
+  }
+
 }

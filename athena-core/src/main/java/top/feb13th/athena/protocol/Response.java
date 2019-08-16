@@ -1,7 +1,6 @@
 package top.feb13th.athena.protocol;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -12,7 +11,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 public class Response {
 
   // 消息分割符
@@ -32,6 +30,14 @@ public class Response {
   private int length;
   // 消息体
   private byte[] body;
+
+  public Response() {
+    this(-1, -1);
+  }
+
+  public Response(int module, int command) {
+    this(module, command, 0, new byte[0]);
+  }
 
   public Response(int module, int command, int code, byte[] body) {
     this.module = module;

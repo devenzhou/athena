@@ -22,6 +22,11 @@ public class SpringContextHolder {
    * 设置spring上下文
    */
   public static synchronized void set(ApplicationContext context) {
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Spring Context Initialization, context:{}", context);
+    }
+
     applicationContext = context;
   }
 

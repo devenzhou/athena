@@ -5,6 +5,7 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 模块bean包装类
@@ -14,6 +15,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class ModuleBeanWrapper {
 
@@ -52,4 +54,5 @@ public class ModuleBeanWrapper {
   public int hashCode() {
     return Objects.hash(module, command, method);
   }
+
 }
