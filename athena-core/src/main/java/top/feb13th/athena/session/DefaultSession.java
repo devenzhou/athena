@@ -1,9 +1,11 @@
 package top.feb13th.athena.session;
 
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.Channel;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import top.feb13th.athena.protocol.Response;
+import top.feb13th.athena.message.Response;
 
 /**
  * 简单的会话实现
@@ -19,15 +21,15 @@ public class DefaultSession implements Session {
   private final ConcurrentMap<Object, Object> map = new ConcurrentHashMap<>();
 
   // 管道处理器上下文
-  private ChannelHandlerContext context;
+  private Channel channel;
 
   /**
    * 默认的构造器
    *
-   * @param context 管道处理器上下文
+   * @param channel 管道
    */
-  public DefaultSession(ChannelHandlerContext context) {
-    this.context = context;
+  public DefaultSession(Channel channel) {
+    this.channel = channel;
   }
 
   @Override
@@ -42,7 +44,9 @@ public class DefaultSession implements Session {
 
   @Override
   public void write(Response response) {
-    context.writeAndFlush(response);
+    if (channel.isOpen()) {
+      channel.writeAndFlush(response);
+    }
   }
 
   @Override
@@ -56,7 +60,15 @@ public class DefaultSession implements Session {
   }
 
   @Override
-  public ChannelHandlerContext getContext() {
-    return context;
+  public Channel getChannel() {
+    return channel;
+  }
+
+  @Override
+  public void connectSuccess() {
+    Channel channel = getChannel();
+    AttributeKey<Session> attributeKey = AttributeKey.newInstance(SESSION_KEY_CHANNEL);
+    Attribute<Session> attribute = channel.attr(attributeKey);
+    attribute.set(this);
   }
 }

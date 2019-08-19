@@ -1,7 +1,6 @@
-package top.feb13th.athena.protocol;
+package top.feb13th.athena.message;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -12,7 +11,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 public class Request {
 
   // 消息分割符
@@ -20,7 +18,7 @@ public class Request {
   // 基础消息长度 - 标记 + 模块号 + 命令号 + 长度
   public static final int BASE_LENGTH = 4 + 4 + 4 + 4;
   // 消息的最大长度
-  public static final int MAX_LENGTH = 4096;
+  public static final int MAX_LENGTH = 1024 * 1024;
 
   // 模块号
   private int module;
@@ -30,6 +28,18 @@ public class Request {
   private int length;
   // 消息体
   private byte[] body;
+
+  public Request() {
+    this(0, 0);
+  }
+
+  public Request(int module, int command) {
+    this(module, command, 0);
+  }
+
+  public Request(int module, int command, int length) {
+    this(module, command, new byte[length]);
+  }
 
   public Request(int module, int command, byte[] body) {
     this.module = module;

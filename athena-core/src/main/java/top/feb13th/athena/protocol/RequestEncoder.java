@@ -3,6 +3,7 @@ package top.feb13th.athena.protocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import top.feb13th.athena.message.Request;
 
 /**
  * 请求编码

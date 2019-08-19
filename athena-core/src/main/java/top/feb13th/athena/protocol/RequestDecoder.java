@@ -1,17 +1,16 @@
 package top.feb13th.athena.protocol;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.feb13th.athena.support.ConnectionChecker;
+import top.feb13th.athena.message.Request;
+import top.feb13th.athena.message.Response;
 
 /**
  * 请求解码器
@@ -19,7 +18,31 @@ import top.feb13th.athena.support.ConnectionChecker;
  * @author zhoutaotao
  * @date 2019/8/15 15:39
  */
+@Getter
+@Setter
 public class RequestDecoder extends ByteToMessageDecoder {
+
+  // 日志
+  private static final Logger logger = LoggerFactory.getLogger(RequestDecoder.class);
+
+  // 消息的最大长度
+  private int messageMaxLength;
+
+  /**
+   * 默认构造器, 消息最大长度默认为: {@link Response#MAX_LENGTH}
+   */
+  public RequestDecoder() {
+    this(Request.MAX_LENGTH);
+  }
+
+  /**
+   * 用于设置消息最大长度的构造器
+   *
+   * @param messageMaxLength 消息最大长度
+   */
+  public RequestDecoder(int messageMaxLength) {
+    this.messageMaxLength = messageMaxLength;
+  }
 
   @Override
   protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
@@ -29,7 +52,16 @@ public class RequestDecoder extends ByteToMessageDecoder {
     }
 
     // 检测字节流是否超出了默认设置的最大值
-    if (in.readableBytes() > Request.MAX_LENGTH) {
+    if (in.readableBytes() > getMessageMaxLength()) {
+      if (logger.isErrorEnabled()) {
+        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+        String hostName = address.getHostName();
+        String hostString = address.getHostString();
+        int port = address.getPort();
+        logger.error(
+            "Find illegal message, receive message more than limit, hostName:{}, host:{}, port:{}",
+            hostName, hostString, port);
+      }
       in.skipBytes(in.readableBytes());
     }
 
@@ -73,13 +105,6 @@ public class RequestDecoder extends ByteToMessageDecoder {
       Request request = new Request(module, command, body);
       out.add(request);
     }
-  }
-
-
-  @Override
-  public void channelActive(ChannelHandlerContext ctx) throws Exception {
-    ConnectionChecker.offer(ctx);
-    super.channelActive(ctx);
   }
 
 }

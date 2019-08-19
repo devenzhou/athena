@@ -15,4 +15,13 @@ public class StringUtil {
     return ObjectUtil.isNull(str) || "".equalsIgnoreCase(str.trim());
   }
 
+  /**
+   * 判断字符串是否不为null,且不为空串
+   */
+  public static boolean nonBlank(String str) {
+    if (ObjectUtil.nonNull(str)) {
+      return !"".equals(str.trim());
+    }
+    return false;
+  }
 }

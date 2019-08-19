@@ -1,6 +1,6 @@
 package top.feb13th.athena.support;
 
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.Channel;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
@@ -16,11 +16,11 @@ public class ConnectionCheckUnit implements Delayed {
 
   // 延迟单元出队时间
   private long executeTime;
-  private ChannelHandlerContext context;
+  private Channel channel;
 
-  public ConnectionCheckUnit(long executeTime, ChannelHandlerContext context) {
+  public ConnectionCheckUnit(long executeTime, Channel channel) {
     this.executeTime = executeTime;
-    this.context = context;
+    this.channel = channel;
   }
 
   @Override

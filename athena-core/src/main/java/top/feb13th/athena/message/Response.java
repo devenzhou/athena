@@ -1,7 +1,8 @@
-package top.feb13th.athena.protocol;
+package top.feb13th.athena.message;
 
 import lombok.Getter;
 import lombok.Setter;
+import top.feb13th.athena.support.SystemStatusCode;
 
 /**
  * 服务端发送给客户端的协议
@@ -36,7 +37,11 @@ public class Response {
   }
 
   public Response(int module, int command) {
-    this(module, command, 0, new byte[0]);
+    this(module, command, SystemStatusCode.SUCCESS.getCode());
+  }
+
+  public Response(int module, int command, int code) {
+    this(module, command, code, new byte[0]);
   }
 
   public Response(int module, int command, int code, byte[] body) {

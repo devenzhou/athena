@@ -15,4 +15,10 @@ public class ObjectUtil {
     return obj == null;
   }
 
+  /**
+   * 校验入参是否不为null
+   */
+  public static boolean nonNull(Object obj) {
+    return !isNull(obj);
+  }
 }

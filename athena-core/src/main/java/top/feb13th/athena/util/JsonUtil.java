@@ -197,6 +197,18 @@ public class JsonUtil {
   }
 
   /**
+   * 将 json 字节数组转换为 java 对象
+   */
+  public static <T> T fromJson(byte[] json, Class<T> clazz) {
+    try {
+      return mapper.readValue(json, clazz);
+    } catch (IOException e) {
+      throw ExceptionUtil.unchecked(e);
+    }
+  }
+
+
+  /**
    * 将 json 字符串数组转换为 java 数组
    */
   public static <T> List<T> fromJsonArray(String json, TypeReference<List<T>> typeReference) {

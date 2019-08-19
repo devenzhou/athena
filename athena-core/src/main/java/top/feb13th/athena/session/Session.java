@@ -1,10 +1,7 @@
 package top.feb13th.athena.session;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
-import top.feb13th.athena.protocol.Response;
+import top.feb13th.athena.message.Response;
 
 /**
  * 客户端会话
@@ -52,18 +49,12 @@ public interface Session {
   Object getAttribute(Object key);
 
   /**
-   * 获取底层管道处理上下文
+   * 获取底层管道
    */
-  ChannelHandlerContext getContext();
+  Channel getChannel();
 
   /**
    * 客户端连接成功
    */
-  default void connectionSuccess() {
-    ChannelHandlerContext context = getContext();
-    Channel channel = context.channel();
-    AttributeKey<Session> attributeKey = AttributeKey.newInstance(SESSION_KEY_CHANNEL);
-    Attribute<Session> attribute = channel.attr(attributeKey);
-    attribute.set(this);
-  }
+  void connectSuccess();
 }

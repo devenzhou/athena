@@ -1,10 +1,12 @@
 package top.feb13th.athena.support;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import java.util.concurrent.DelayQueue;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.feb13th.athena.session.Session;
@@ -16,23 +18,37 @@ import top.feb13th.athena.util.ExceptionUtil;
  * @author zhoutaotao
  * @date 2019/8/16 13:18
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class ConnectionChecker {
 
   // 日志
   private static final Logger logger = LoggerFactory.getLogger(ConnectionChecker.class);
+  // 默认channel延时检查时间
+  public static final int DEFAULT_DELAY_TIME_MILLISECOND = 1000 * 3;
   // 延迟队列, 用于检测所有连接但是未登录的请求
   private static final DelayQueue<ConnectionCheckUnit> delayQueue = new DelayQueue<>();
   // 延迟时间
-  private static final long delayTimeMilli = 3 * 1000;
+  private long delayTimeMilli = 3 * 1000;
+
+  /**
+   * 默认构造器
+   *
+   * @param delayTimeMilli 延迟时间, 毫秒
+   */
+  public ConnectionChecker(long delayTimeMilli) {
+    this.delayTimeMilli = delayTimeMilli;
+  }
 
   /**
    * 入队
    *
-   * @param context 连接上下文
+   * @param channel 连接上下文
    */
-  public static void offer(ChannelHandlerContext context) {
+  public void offer(Channel channel) {
     long time = System.currentTimeMillis() + delayTimeMilli;
-    ConnectionCheckUnit unit = new ConnectionCheckUnit(time, context);
+    ConnectionCheckUnit unit = new ConnectionCheckUnit(time, channel);
     delayQueue.offer(unit);
   }
 
@@ -50,8 +66,7 @@ public class ConnectionChecker {
           if (unit == null) {
             continue;
           }
-          ChannelHandlerContext context = unit.getContext();
-          Channel channel = context.channel();
+          Channel channel = unit.getChannel();
           if (channel.isOpen()) {
             // 检测当前session是否登录
             AttributeKey<Session> attributeKey = AttributeKey
@@ -61,8 +76,9 @@ public class ConnectionChecker {
             // session 为null时说明用户未登录
             if (session == null) {
               if (logger.isDebugEnabled()) {
-                logger.debug("Close Connection, name:{}, remoteAddress:{}", context.name(),
-                    channel.remoteAddress());
+                logger
+                    .debug("Close Connection, name:{}, remoteAddress:{}", channel.id().asLongText(),
+                        channel.remoteAddress());
               }
               channel.close();
             }
