@@ -29,6 +29,9 @@ public class Request {
   // 消息体
   private byte[] body;
 
+  /**
+   * 默认心跳请求使用该构造器
+   */
   public Request() {
     this(0, 0);
   }
