@@ -5,13 +5,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import java.net.InetSocketAddress;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.feb13th.athena.exception.Assertion;
+import top.feb13th.athena.exception.AssertionError;
 import top.feb13th.athena.message.JsonMessageConvert;
 import top.feb13th.athena.message.MessageConvert;
+import top.feb13th.athena.message.MessageGenerator;
 import top.feb13th.athena.message.Request;
 import top.feb13th.athena.message.Response;
 import top.feb13th.athena.session.Session;
@@ -89,13 +93,41 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
     }
 
     ModuleBeanWrapper wrapper = ModuleBeanHolder.get(module, command);
-    Response response = new Response(module, command);
     if (wrapper == null) {
-      moduleCommandNotFound(response, out);
+      // 资源找不到
+      if (logger.isDebugEnabled()) {
+        logger.debug("Resource not found, module:{}, command:{}", module, command);
+      }
+      out.add(MessageGenerator.resourceNotFound(module, command));
       return;
     }
 
+    Channel channel = ctx.channel();
+    Session session = SessionHolder.get(channel);
+    if (!wrapper.isEnter() && ObjectUtil.isNull(session)) {
+      // 未授权
+      if (logger.isDebugEnabled()) {
+        InetSocketAddress address = (InetSocketAddress) channel.remoteAddress();
+        String hostName = address.getHostName();
+        int port = address.getPort();
+        String hostString = address.getHostString();
+        logger.debug("Unauthorized request, module:{}, command:{}, hostName:{}, port:{}, host:{}",
+            module, command, hostName, port, hostString);
+      }
+      out.add(MessageGenerator.unauthorized(module, command));
+      return;
+    }
 
+    // 执行方法调用
+    try {
+      invokeMethod(wrapper, channel, msg, out);
+    } catch (AssertionError assertionError) {
+      Assertion assertion = assertionError.getAssertion();
+      int errorCode = assertion.errorCode();
+      out.add(MessageGenerator.createResponse(module, command, errorCode));
+    } catch (Exception exception) {
+      out.add(MessageGenerator.serviceError(module, command));
+    }
 
   }
 
@@ -107,14 +139,16 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
   }
 
   /**
-   * 资源未找到
+   * 调用模块号和命令号指定的方法
    *
-   * @param response 响应对象
-   * @param out 输出
+   * @param wrapper 方法包装器
+   * @param channel 管道
+   * @param request 请求对象
+   * @param out netty过滤链中传递的对象
    */
-  private void moduleCommandNotFound(Response response, List<Object> out) {
-    response.setCode(SystemStatusCode.RESOURCE_NOT_FOUND.getCode());
-    out.add(response);
+  private void invokeMethod(ModuleBeanWrapper wrapper, Channel channel, Request request,
+      List<Object> out) {
+    // TODO 调用执行方法
   }
 
 

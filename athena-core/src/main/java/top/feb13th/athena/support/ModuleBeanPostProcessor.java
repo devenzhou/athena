@@ -1,6 +1,7 @@
 package top.feb13th.athena.support;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import top.feb13th.athena.annotation.Command;
@@ -42,6 +43,8 @@ public class ModuleBeanPostProcessor implements BeanPostProcessor {
       String methodName = method.getName();
       // 方法参数
       Class<?>[] parameterTypes = method.getParameterTypes();
+      // 返回值类型
+      Class<?> returnType = method.getReturnType();
       ModuleBeanWrapper wrapper = new ModuleBeanWrapper();
       wrapper.setBean(bean);
       wrapper.setBeanName(beanName);
@@ -49,8 +52,9 @@ public class ModuleBeanPostProcessor implements BeanPostProcessor {
       wrapper.setCommand(command);
       wrapper.setEnter(enter);
       wrapper.setMethod(method);
+      wrapper.setReturnType(returnType);
       wrapper.setMethodName(methodName);
-      wrapper.setParameterTypes(parameterTypes);
+      wrapper.setParameterTypes(Arrays.asList(parameterTypes));
       ModuleBeanHolder.set(wrapper);
     }
 

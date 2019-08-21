@@ -10,9 +10,12 @@ import lombok.Getter;
  */
 public enum SystemStatusCode {
 
-  SUCCESS(200, "success"),
-  RESOURCE_NOT_FOUND(404, "Resource not found"),
-  FAILURE(500, "failure"),
+  ERROR(100, "系统错误"),
+
+  SUCCESS(200, "成功"),
+  UNAUTHORIZED(403, "未授权"),
+  RESOURCE_NOT_FOUND(404, "资源找不到"),
+  FAILURE(500, "失败"),
   ;
 
   // 状态码

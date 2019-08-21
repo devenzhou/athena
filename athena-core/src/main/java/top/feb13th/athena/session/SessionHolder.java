@@ -1,5 +1,8 @@
 package top.feb13th.athena.session;
 
+import io.netty.channel.Channel;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
@@ -51,6 +54,17 @@ public class SessionHolder {
    */
   public static Session get(String id) {
     return sessionMap.get(id);
+  }
+
+  /**
+   * 根据channel获取session
+   *
+   * @param channel 管道
+   */
+  public static Session get(Channel channel) {
+    AttributeKey<Session> attributeKey = AttributeKey.newInstance(Session.SESSION_KEY_CHANNEL);
+    Attribute<Session> attribute = channel.attr(attributeKey);
+    return attribute.get();
   }
 
   /**
