@@ -15,6 +15,13 @@ public interface MessageConvert {
    * @param clazz 被转换的对象类型
    * @return 转换后的对象
    */
-  Object convert(byte[] origin, Class<?> clazz);
+  Object byteToMessage(byte[] origin, Class<?> clazz);
 
+  /**
+   * 将java对象序列化为byte数组
+   *
+   * @param msg java对象
+   * @return byte数组
+   */
+  byte[] messageToByte(Object msg);
 }

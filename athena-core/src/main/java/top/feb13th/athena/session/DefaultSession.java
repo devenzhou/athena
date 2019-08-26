@@ -1,10 +1,9 @@
 package top.feb13th.athena.session;
 
 import io.netty.channel.Channel;
-import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import top.feb13th.athena.message.Response;
 
 /**
@@ -22,6 +21,8 @@ public class DefaultSession implements Session {
 
   // 管道处理器上下文
   private Channel channel;
+  // 连接是否成功 true:连接成功
+  private AtomicBoolean connectStatus = new AtomicBoolean(false);
 
   /**
    * 默认的构造器
@@ -66,9 +67,11 @@ public class DefaultSession implements Session {
 
   @Override
   public void connectSuccess() {
-    Channel channel = getChannel();
-    AttributeKey<Session> attributeKey = AttributeKey.newInstance(SESSION_KEY_CHANNEL);
-    Attribute<Session> attribute = channel.attr(attributeKey);
-    attribute.set(this);
+    connectStatus.set(true);
+  }
+
+  @Override
+  public boolean isConnectSuccess() {
+    return connectStatus.get();
   }
 }

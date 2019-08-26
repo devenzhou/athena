@@ -41,6 +41,16 @@ public class MessageGenerator {
   }
 
   /**
+   * 服务执行成功
+   *
+   * @param module 模块号
+   * @param command 命令号
+   */
+  public static Response serviceSuccess(int module, int command) {
+    return createResponse(module, command, SystemStatusCode.SUCCESS);
+  }
+
+  /**
    * 构建响应对象
    *
    * @param module 模块号

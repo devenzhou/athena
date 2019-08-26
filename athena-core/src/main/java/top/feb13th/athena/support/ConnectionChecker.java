@@ -74,7 +74,7 @@ public class ConnectionChecker {
             Attribute<Session> attribute = channel.attr(attributeKey);
             Session session = attribute.get();
             // session 为null时说明用户未登录
-            if (session == null) {
+            if (session == null || !session.isConnectSuccess()) {
               if (logger.isDebugEnabled()) {
                 logger
                     .debug("Close Connection, name:{}, remoteAddress:{}", channel.id().asLongText(),

@@ -57,4 +57,11 @@ public interface Session {
    * 客户端连接成功
    */
   void connectSuccess();
+
+  /**
+   * 检测连接是否成功
+   *
+   * @return true: 连接成功
+   */
+  boolean isConnectSuccess();
 }

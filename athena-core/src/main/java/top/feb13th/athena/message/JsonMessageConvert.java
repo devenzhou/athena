@@ -1,5 +1,6 @@
 package top.feb13th.athena.message;
 
+import java.nio.charset.Charset;
 import top.feb13th.athena.util.JsonUtil;
 
 /**
@@ -11,10 +12,16 @@ import top.feb13th.athena.util.JsonUtil;
 public class JsonMessageConvert implements MessageConvert {
 
   @Override
-  public Object convert(byte[] origin, Class<?> clazz) {
+  public Object byteToMessage(byte[] origin, Class<?> clazz) {
     if (origin == null || origin.length == 0) {
       return null;
     }
     return JsonUtil.fromJson(origin, clazz);
+  }
+
+  @Override
+  public byte[] messageToByte(Object msg) {
+    String json = JsonUtil.toJson(msg);
+    return json.getBytes(Charset.forName("UTF-8"));
   }
 }

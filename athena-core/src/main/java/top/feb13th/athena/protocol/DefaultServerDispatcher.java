@@ -1,12 +1,17 @@
 package top.feb13th.athena.protocol;
 
+import com.google.common.collect.Lists;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -18,6 +23,7 @@ import top.feb13th.athena.message.MessageConvert;
 import top.feb13th.athena.message.MessageGenerator;
 import top.feb13th.athena.message.Request;
 import top.feb13th.athena.message.Response;
+import top.feb13th.athena.session.DefaultSession;
 import top.feb13th.athena.session.Session;
 import top.feb13th.athena.session.SessionHolder;
 import top.feb13th.athena.support.ConnectionChecker;
@@ -126,6 +132,9 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
       int errorCode = assertion.errorCode();
       out.add(MessageGenerator.createResponse(module, command, errorCode));
     } catch (Exception exception) {
+      if (logger.isErrorEnabled()) {
+        logger.error(exception.getMessage(), exception);
+      }
       out.add(MessageGenerator.serviceError(module, command));
     }
 
@@ -147,9 +156,109 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
    * @param out netty过滤链中传递的对象
    */
   private void invokeMethod(ModuleBeanWrapper wrapper, Channel channel, Request request,
-      List<Object> out) {
-    // TODO 调用执行方法
+      List<Object> out) throws InvocationTargetException, IllegalAccessException {
+    // 输入数据
+    int module = request.getModule();
+    int command = request.getCommand();
+    byte[] byteData = request.getBody();
+
+    // 用于返回的相应对象
+    Response response = MessageGenerator.serviceSuccess(module, command);
+
+    // 会话信息
+    AttributeKey<Session> attributeKey = AttributeKey.newInstance(Session.SESSION_KEY_CHANNEL);
+    Attribute<Session> sessionAttribute = channel.attr(attributeKey);
+    Session session = sessionAttribute.setIfAbsent(new DefaultSession(channel));
+
+    // 方法封装信息
+    Object bean = wrapper.getBean();
+    Method method = wrapper.getMethod();
+    Class<?> returnType = wrapper.getReturnType();
+    List<Class<?>> parameterTypes = wrapper.getParameterTypes();
+    Map<Class<?>, Set<Class<?>>> parameterInterfaceMap = wrapper.getParameterInterfaceMap();
+    Map<Class<?>, Set<Class<?>>> parameterSuperClassMap = wrapper.getParameterSuperClassMap();
+
+    // 方法传入对象集合
+    List<Object> parameterObjects = Lists.newArrayListWithCapacity(parameterTypes.size());
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Set parameter value, module:{}, command:{}, beanName:{}, methodName:{}", module,
+          command, wrapper.getBeanName(), wrapper.getMethodName());
+    }
+
+    for (Class<?> parameterType : parameterTypes) {
+      // 检测当前参数类型是否是 Request
+      if (isSameClass(Request.class, parameterType, parameterInterfaceMap,
+          parameterSuperClassMap)) {
+        parameterObjects.add(request);
+        continue;
+      }
+      // 检测当前参数类型是否是 Response
+      if (isSameClass(Response.class, parameterType, parameterInterfaceMap,
+          parameterSuperClassMap)) {
+        parameterObjects.add(response);
+        continue;
+      }
+      // 检测当前参数类型是否是 Session
+      if (isSameClass(Session.class, parameterType, parameterInterfaceMap,
+          parameterSuperClassMap)) {
+        parameterObjects.add(session);
+        continue;
+      }
+      // 没有既定类型, 通过消息转换器转换
+      Object message = messageConvert.byteToMessage(byteData, parameterType);
+      parameterObjects.add(message);
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "Invoke method, module:{}, command:{}, beanName:{}, methodName:{}, parameterValues:{}",
+          module,
+          command, wrapper.getBeanName(), wrapper.getMethodName(), parameterObjects);
+    }
+
+    // 调用方法
+    Object returnObject = method.invoke(bean, parameterObjects);
+    // 只有方法有返回值,且返回值不为null时,调用消息转换器转换为字节数组
+    if (returnType != Void.class && ObjectUtil.nonNull(returnObject)) {
+      byte[] bytes = messageConvert.messageToByte(returnObject);
+      if (ObjectUtil.nonNull(bytes) && bytes.length > 0) {
+        response.setLength(bytes.length);
+        response.setBody(bytes);
+      }
+    }
+
+    // 继续执行过滤链
+    out.add(response);
   }
 
+  /**
+   * 检查参数类型是否是指定类型
+   *
+   * @param clazz 指定的类型
+   * @param parameterClazz 参数类型
+   * @param parameterInterfaceMap 参数所有的接口类型
+   * @param parameterSuperClassMap 参数所有的父类类型
+   * @return true:类型一致
+   */
+  private boolean isSameClass(Class<?> clazz, Class<?> parameterClazz,
+      Map<Class<?>, Set<Class<?>>> parameterInterfaceMap,
+      Map<Class<?>, Set<Class<?>>> parameterSuperClassMap) {
+
+    // 如果类型直接匹配, 则返回true
+    if (clazz == parameterClazz) {
+      return true;
+    }
+
+    // 如果是接口, 则判断接口集中是否存在该接口,否则判断参数类的父类是否是该类型
+    if (clazz.isInterface()) {
+      Set<Class<?>> interfaceSet = parameterInterfaceMap.get(parameterClazz);
+      return interfaceSet.contains(clazz);
+    }
+
+    Set<Class<?>> superClassSet = parameterSuperClassMap.get(parameterClazz);
+
+    return superClassSet.contains(clazz);
+  }
 
 }

@@ -1,12 +1,13 @@
 package top.feb13th.athena.support;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,9 +44,9 @@ public class ModuleBeanWrapper {
   // 方法参数
   private List<Class<?>> parameterTypes;
   // 方法参数类型对应的接口
-  private Map<Class<?>, List<Class<?>>> parameterInterfaceMap;
+  private Map<Class<?>, Set<Class<?>>> parameterInterfaceMap;
   // 方法参数类型对应的父类
-  private Map<Class<?>, List<Class<?>>> parameterSuperClassMap;
+  private Map<Class<?>, Set<Class<?>>> parameterSuperClassMap;
 
   public void setParameterTypes(List<Class<?>> parameterTypes) {
     this.parameterTypes = parameterTypes;
@@ -60,9 +61,11 @@ public class ModuleBeanWrapper {
     parameterSuperClassMap = new HashMap<>();
     for (Class<?> parameterType : parameterTypes) {
       Class<?>[] interfaces = parameterType.getInterfaces();
-      parameterInterfaceMap.put(parameterType, Arrays.asList(interfaces));
-      List<Class<?>> superClassList = new ArrayList<>();
-      addSuperClass(parameterType, superClassList);
+      Set<Class<?>> interfaceSet = new HashSet<>(Arrays.asList(interfaces));
+      parameterInterfaceMap.put(parameterType, interfaceSet);
+      Set<Class<?>> superClassSet = new HashSet<>();
+      addSuperClass(parameterType, superClassSet, interfaceSet);
+      parameterSuperClassMap.put(parameterType, superClassSet);
     }
   }
 
@@ -70,15 +73,19 @@ public class ModuleBeanWrapper {
    * 递归获取父类
    *
    * @param clazz 用于获取父类的对象
-   * @param list 用于存储所有父类对象的列表
+   * @param superClassSet 用于存储所有父类对象的列表
+   * @param interfaceSet 接口集合
    */
-  private void addSuperClass(Class<?> clazz, List<Class<?>> list) {
+  private void addSuperClass(Class<?> clazz, Set<Class<?>> superClassSet,
+      Set<Class<?>> interfaceSet) {
     Class<?> superclass = clazz.getSuperclass();
-    list.add(superclass);
+    superClassSet.add(superclass);
+    Class<?>[] interfaces = superclass.getInterfaces();
+    interfaceSet.addAll(Arrays.asList(interfaces));
     if (superclass == Object.class) {
       return;
     }
-    addSuperClass(superclass, list);
+    addSuperClass(superclass, superClassSet, interfaceSet);
   }
 
   @Override
