@@ -18,6 +18,8 @@ public class ResponseEncoder extends MessageToByteEncoder<Response> {
   protected void encode(ChannelHandlerContext ctx, Response msg, ByteBuf out) throws Exception {
     // 写出开始标记
     out.writeInt(Request.FLAG);
+    // identity
+    out.writeInt(msg.getIdentity());
     // 模块号
     out.writeInt(msg.getModule());
     // 命令号

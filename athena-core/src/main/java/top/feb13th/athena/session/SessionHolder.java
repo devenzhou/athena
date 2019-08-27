@@ -22,7 +22,7 @@ public class SessionHolder {
   // 日志
   private static final Logger logger = LoggerFactory.getLogger(SessionHolder.class);
 
-  // id -> session
+  // identity -> session
   private static final ConcurrentMap<String, Session> sessionMap = new ConcurrentHashMap<>();
 
   /**
@@ -36,14 +36,14 @@ public class SessionHolder {
       throw new IllegalArgumentException("Session must not null");
     }
     if (StringUtil.isBlank(session.id())) {
-      logger.error("Session id must not empty");
-      throw new IllegalArgumentException("Session id must not empty");
+      logger.error("Session identity must not empty");
+      throw new IllegalArgumentException("Session identity must not empty");
     }
     String sessionId = session.id();
     Session existsSession = sessionMap.putIfAbsent(sessionId, session);
     if (!ObjectUtil.isNull(existsSession)) {
-      logger.error("The session id exists, id:{}", sessionId);
-      throw new IllegalArgumentException("The session id exists, id:" + sessionId);
+      logger.error("The session identity exists, identity:{}", sessionId);
+      throw new IllegalArgumentException("The session identity exists, identity:" + sessionId);
     }
   }
 
@@ -84,6 +84,9 @@ public class SessionHolder {
    * @return true:发送成功, false:接受的客户端不存在
    */
   public static boolean sendTo(String id, Response response) {
+    if (ObjectUtil.isNull(response)) {
+      throw new NullPointerException("response must not null");
+    }
     Session session = sessionMap.get(id);
     if (ObjectUtil.isNull(session)) {
       return false;
@@ -98,6 +101,9 @@ public class SessionHolder {
    * @param response 用于推送的消息
    */
   public static void broadcast(Response response) {
+    if (ObjectUtil.isNull(response)) {
+      throw new NullPointerException("response must not null");
+    }
     sessionMap.values().parallelStream().forEach(session -> session.write(response));
   }
 

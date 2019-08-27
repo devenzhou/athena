@@ -87,6 +87,7 @@ public class RequestDecoder extends ByteToMessageDecoder {
       }
 
       // 读取必要的数据 - 模块号,命令号,长度
+      int id = in.readInt();
       int module = in.readInt();
       int command = in.readInt();
       int length = in.readInt();
@@ -102,7 +103,7 @@ public class RequestDecoder extends ByteToMessageDecoder {
       in.readBytes(body);
 
       // 构建Request
-      Request request = new Request(module, command, body);
+      Request request = new Request(module, command, id, body);
       out.add(request);
     }
   }

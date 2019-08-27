@@ -88,6 +88,32 @@ public class ModuleBeanWrapper {
     addSuperClass(superclass, superClassSet, interfaceSet);
   }
 
+  /**
+   * 检查参数类型是否是指定类型
+   *
+   * @param clazz 指定的类型
+   * @param parameterClazz 参数类型
+   * @return true:类型一致
+   */
+  public boolean isSameClass(Class<?> clazz, Class<?> parameterClazz) {
+
+    // 如果类型直接匹配, 则返回true
+    if (clazz == parameterClazz) {
+      return true;
+    }
+
+    // 如果是接口, 则判断接口集中是否存在该接口,否则判断参数类的父类是否是该类型
+    if (clazz.isInterface()) {
+      Set<Class<?>> interfaceSet = parameterInterfaceMap.get(parameterClazz);
+      return interfaceSet.contains(clazz);
+    }
+
+    Set<Class<?>> superClassSet = parameterSuperClassMap.get(parameterClazz);
+
+    return superClassSet.contains(clazz);
+  }
+
+
   @Override
   public boolean equals(Object object) {
     if (this == object) {

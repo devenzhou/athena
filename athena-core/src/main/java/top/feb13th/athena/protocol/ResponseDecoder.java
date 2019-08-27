@@ -86,6 +86,7 @@ public class ResponseDecoder extends ByteToMessageDecoder {
       }
 
       // 读取必要的数据 - 模块号,命令号,状态码,长度
+      int id = in.readInt();
       int module = in.readInt();
       int command = in.readInt();
       int code = in.readInt();
@@ -102,7 +103,7 @@ public class ResponseDecoder extends ByteToMessageDecoder {
       in.readBytes(body);
 
       // 构建Response
-      Response response = new Response(module, command, code, body);
+      Response response = new Response(id, module, command, code, body);
       out.add(response);
     }
 

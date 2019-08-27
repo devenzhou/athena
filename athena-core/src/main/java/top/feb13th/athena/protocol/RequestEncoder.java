@@ -17,10 +17,13 @@ public class RequestEncoder extends MessageToByteEncoder<Request> {
   protected void encode(ChannelHandlerContext ctx, Request msg, ByteBuf out) throws Exception {
     // 写出开始标记
     out.writeInt(Request.FLAG);
+    // identity
+    out.writeInt(msg.getIdentity());
     // 模块号
     out.writeInt(msg.getModule());
     // 命令号
     out.writeInt(msg.getCommand());
+
     // body长度
     out.writeInt(msg.getLength());
     // body

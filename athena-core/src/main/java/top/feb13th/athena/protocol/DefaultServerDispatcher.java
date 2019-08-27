@@ -10,8 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -20,9 +18,9 @@ import top.feb13th.athena.exception.Assertion;
 import top.feb13th.athena.exception.AssertionError;
 import top.feb13th.athena.message.JsonMessageConvert;
 import top.feb13th.athena.message.MessageConvert;
-import top.feb13th.athena.message.MessageGenerator;
 import top.feb13th.athena.message.Request;
 import top.feb13th.athena.message.Response;
+import top.feb13th.athena.message.ResponseGenerator;
 import top.feb13th.athena.session.DefaultSession;
 import top.feb13th.athena.session.Session;
 import top.feb13th.athena.session.SessionHolder;
@@ -91,6 +89,7 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
 
   @Override
   protected void decode(ChannelHandlerContext ctx, Request msg, List<Object> out) throws Exception {
+    int id = msg.getIdentity();
     int module = msg.getModule();
     int command = msg.getCommand();
 
@@ -104,7 +103,7 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
       if (logger.isDebugEnabled()) {
         logger.debug("Resource not found, module:{}, command:{}", module, command);
       }
-      out.add(MessageGenerator.resourceNotFound(module, command));
+      out.add(ResponseGenerator.resourceNotFound(id, module, command));
       return;
     }
 
@@ -120,7 +119,7 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
         logger.debug("Unauthorized request, module:{}, command:{}, hostName:{}, port:{}, host:{}",
             module, command, hostName, port, hostString);
       }
-      out.add(MessageGenerator.unauthorized(module, command));
+      out.add(ResponseGenerator.unauthorized(id, module, command));
       return;
     }
 
@@ -130,12 +129,12 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
     } catch (AssertionError assertionError) {
       Assertion assertion = assertionError.getAssertion();
       int errorCode = assertion.errorCode();
-      out.add(MessageGenerator.createResponse(module, command, errorCode));
+      out.add(ResponseGenerator.createResponse(id, module, command, errorCode));
     } catch (Exception exception) {
       if (logger.isErrorEnabled()) {
         logger.error(exception.getMessage(), exception);
       }
-      out.add(MessageGenerator.serviceError(module, command));
+      out.add(ResponseGenerator.serviceError(id, module, command));
     }
 
   }
@@ -158,12 +157,13 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
   private void invokeMethod(ModuleBeanWrapper wrapper, Channel channel, Request request,
       List<Object> out) throws InvocationTargetException, IllegalAccessException {
     // 输入数据
+    int id = request.getIdentity();
     int module = request.getModule();
     int command = request.getCommand();
     byte[] byteData = request.getBody();
 
     // 用于返回的相应对象
-    Response response = MessageGenerator.serviceSuccess(module, command);
+    Response response = ResponseGenerator.serviceSuccess(id, module, command);
 
     // 会话信息
     AttributeKey<Session> attributeKey = AttributeKey.newInstance(Session.SESSION_KEY_CHANNEL);
@@ -175,8 +175,6 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
     Method method = wrapper.getMethod();
     Class<?> returnType = wrapper.getReturnType();
     List<Class<?>> parameterTypes = wrapper.getParameterTypes();
-    Map<Class<?>, Set<Class<?>>> parameterInterfaceMap = wrapper.getParameterInterfaceMap();
-    Map<Class<?>, Set<Class<?>>> parameterSuperClassMap = wrapper.getParameterSuperClassMap();
 
     // 方法传入对象集合
     List<Object> parameterObjects = Lists.newArrayListWithCapacity(parameterTypes.size());
@@ -188,20 +186,17 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
 
     for (Class<?> parameterType : parameterTypes) {
       // 检测当前参数类型是否是 Request
-      if (isSameClass(Request.class, parameterType, parameterInterfaceMap,
-          parameterSuperClassMap)) {
+      if (wrapper.isSameClass(Request.class, parameterType)) {
         parameterObjects.add(request);
         continue;
       }
       // 检测当前参数类型是否是 Response
-      if (isSameClass(Response.class, parameterType, parameterInterfaceMap,
-          parameterSuperClassMap)) {
+      if (wrapper.isSameClass(Response.class, parameterType)) {
         parameterObjects.add(response);
         continue;
       }
       // 检测当前参数类型是否是 Session
-      if (isSameClass(Session.class, parameterType, parameterInterfaceMap,
-          parameterSuperClassMap)) {
+      if (wrapper.isSameClass(Session.class, parameterType)) {
         parameterObjects.add(session);
         continue;
       }
@@ -230,35 +225,6 @@ public class DefaultServerDispatcher extends MessageToMessageDecoder<Request> {
 
     // 继续执行过滤链
     out.add(response);
-  }
-
-  /**
-   * 检查参数类型是否是指定类型
-   *
-   * @param clazz 指定的类型
-   * @param parameterClazz 参数类型
-   * @param parameterInterfaceMap 参数所有的接口类型
-   * @param parameterSuperClassMap 参数所有的父类类型
-   * @return true:类型一致
-   */
-  private boolean isSameClass(Class<?> clazz, Class<?> parameterClazz,
-      Map<Class<?>, Set<Class<?>>> parameterInterfaceMap,
-      Map<Class<?>, Set<Class<?>>> parameterSuperClassMap) {
-
-    // 如果类型直接匹配, 则返回true
-    if (clazz == parameterClazz) {
-      return true;
-    }
-
-    // 如果是接口, 则判断接口集中是否存在该接口,否则判断参数类的父类是否是该类型
-    if (clazz.isInterface()) {
-      Set<Class<?>> interfaceSet = parameterInterfaceMap.get(parameterClazz);
-      return interfaceSet.contains(clazz);
-    }
-
-    Set<Class<?>> superClassSet = parameterSuperClassMap.get(parameterClazz);
-
-    return superClassSet.contains(clazz);
   }
 
 }
