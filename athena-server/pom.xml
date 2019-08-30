@@ -14,7 +14,10 @@
   <packaging>jar</packaging>
 
   <dependencies>
-    
+    <dependency>
+      <groupId>top.feb13th</groupId>
+      <artifactId>athena-core</artifactId>
+    </dependency>
   </dependencies>
 
 </project>
