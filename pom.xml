@@ -46,7 +46,7 @@
     <commons.httpclient.version>3.1</commons.httpclient.version>
     <hikaricp.version>3.3.1</hikaricp.version>
     <mysql.connector.version>8.0.16</mysql.connector.version>
-    <jackson.version>2.9.9</jackson.version>
+    <jackson.version>2.10.3</jackson.version>
     <lombok.version>1.18.8</lombok.version>
   </properties>
 
